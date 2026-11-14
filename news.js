@@ -3,6 +3,14 @@
 // The technical list is CHANGELOG.md.
 window.ECO_NEWS = [
   {
+    id: 3, version: '0.3.0', date: '2026-11-14', emoji: '💰',
+    text: {
+      es: '¡Primer juego! «¿Te lo llevas?»: 15 preguntas de economía, el premio se dobla en cada escalón y tú decides cuándo plantarte. Con ranking y reto para tus amigos.',
+      ca: "Primer joc! «T'ho emportes?»: 15 preguntes d'economia, el premi es dobla a cada esglaó i tu decideixes quan plantar-te. Amb rànquing i repte per als amics.",
+      en: 'First game! “Cash Out?”: 15 economics questions, the prize doubles every step and you decide when to stop. With a ranking and a challenge for your friends.',
+    },
+  },
+  {
     id: 2, version: '0.2.0', date: '2026-11-14', emoji: '🎵',
     text: {
       es: 'Escucha la música de «¿Te lo llevas?» en la Sala de música (abajo del todo): cuanto más alto subes, más aprieta.',

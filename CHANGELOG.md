@@ -4,6 +4,31 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
+## [0.3.0] — 2026-11-14
+### Added
+- **¿Te lo llevas?** (`games/quiz/`, CA *T'ho emportes?*, EN *Cash Out?*), the first game, built to `docs/quiz-spec.md`:
+  - 15 steps from easy to hard (tiers 1–3 at steps 1–5, 6–10, 11–15). The prize is 100 € × 2^(n−1), up to 1,638,400 €, with safety nets at steps 5 (1,600 €) and 10 (51,200 €). You see each question, then answer or cash out. A wrong answer or a time-out drops you to the last safety net.
+  - Questions are random each run, mixed across all 5 categories (never the same category twice in a row, balanced across the run).
+  - Three helps, once each: **50:50**, **Ask Duro** (a hint in a speech bubble, tap to close) and **Ask the market** (a crowd vote shown as a fill behind each answer; the crowd is right 85% / 65% / 45% of the time by tier).
+  - Timer: 30 s on steps 1–10 and 45 s on 11–15. It turns red and switches the music to "danger" at 10 s, with a beep each second. It can be turned off, and then the run is not ranked.
+  - After every answer, an explanation with its syllabus tag (e.g. `ECO-A · Coste de oportunidad`). The answer is revealed after a pause of suspense, and the music dips under it.
+  - End screen: the prize, a line from Duro (reaching the top explains compound growth), the player's name, *Save & share*, *Again* and *Ranking*.
+  - **Ranking** on the device: the top 10 (`eco.quiz.scores`). Names are always shown as text.
+  - **Share**: a 1080×1350 PNG card (Duro, name, prize, step, *¿Me superas?*) through the phone's share sheet, plus a "beat me" link (`?n=&p=&s=`). On desktop, the card downloads and the link is copied. Opening the link shows the challenge on the start screen; the score in it is capped at the real maximum.
+  - Music: the tension track follows the step. Sound effects (`EcoAudio.play`): lock-in, right, wrong, time-out, last seconds, help, cash register, a high-stakes sting at step 11, and a win fanfare.
+- **Question bank** (`games/quiz/questions-[a-e].js`): 150 questions, 30 per category and 10 per tier, in ES/CA/EN, each with an explanation, a hint, a topic and its source in the official syllabus (`docs/curriculum.md`). Written by one writer per category, then checked by an independent reviewer for correctness, single right answer, outdated facts, translation, neutrality and hints that gave the answer away.
+- Hub: the quiz card is live; a *Coming soon* card stays for the next game.
+- `Eco.setBusy()`: a new version no longer reloads a page in the middle of a game. The quiz is busy outside its start screen, and the update applies when the player is back there or opens the hub.
+- `EcoAudio.play(name)` and `EcoAudio.duck(on)`.
+### Fixed
+- A version update could reload the page in the middle of a run, which lost it. Found while play-testing.
+- The money format is consistent: the browser's Spanish format writes "1600 €" but "12.800 €"; it is now always "1.600 €" (and "€1,600" in English).
+- The toast is as wide as its text (it used to shrink to a narrow column).
+### Tested
+- Played full runs with real clicks: winning all 15 steps, falling at steps 3, 7 and 12 (0 € / 1,600 € / 51,200 €), cashing out at step 4 (400 €), all three helps, timer expiry, saving, ranking, the share card, and challenge links (including injected HTML and an inflated score). No script errors.
+- Layout: every question in every language (450 renders) fits a 320×568 screen with all answers and the cash-out button visible, with the market vote shown (worst case 556 px).
+- Service worker cache `eco-v5`; the quiz files are precached.
+
 ## [0.2.2] — 2026-11-14
 ### Fixed
 - Entrance animation (`.rise`): content is visible by default and the animation only fades it in (`animation-fill-mode: backwards`). Before, it started at `opacity: 0` and needed the animation to run to appear, so where animations are switched off (`animation: none`) the hub stayed empty. Service worker cache `eco-v4`.

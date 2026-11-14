@@ -248,6 +248,44 @@
     get danger() { return danger; },
   };
 
+  // ---------- sound effects ----------
+  function tone(t, freq, dur, { type = 'sine', vel = 0.2, to = null, bus = null, wet = 0.15 } = {}) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vel, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(bus || sfxBus);
+    if (wet) { const w = ctx.createGain(); w.gain.value = wet; g.connect(w).connect(reverb); }
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function noiseHit(t, dur, freq, vel, type = 'bandpass') {
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noise(); f.type = type; f.frequency.value = freq; f.Q.value = 1.2;
+    g.gain.setValueAtTime(vel, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f).connect(g).connect(sfxBus); s.start(t); s.stop(t + dur + 0.02);
+  }
+  const SFX = {
+    tap(t) { tone(t, 900, 0.05, { type: 'triangle', vel: 0.12, wet: 0 }); },
+    lock(t) { tone(t, 220, 0.25, { type: 'square', vel: 0.08, to: 180 }); tone(t, 440, 0.25, { vel: 0.1, to: 360 }); },
+    right(t) { [72, 76, 79, 84].forEach((m, i) => tone(t + i * 0.08, hz(m), 0.35, { type: 'triangle', vel: 0.16 })); },
+    wrong(t) { tone(t, hz(50), 0.6, { type: 'sawtooth', vel: 0.12, to: hz(43) }); tone(t + 0.02, hz(51), 0.6, { type: 'sawtooth', vel: 0.1, to: hz(44) }); },
+    timeout(t) { [0, 0.18, 0.36].forEach((d) => tone(t + d, 880, 0.12, { type: 'square', vel: 0.08, wet: 0 })); SFX.wrong(t + 0.5); },
+    second(t) { tone(t, 1320, 0.06, { type: 'square', vel: 0.06, wet: 0 }); },
+    lifeline(t) { noiseHit(t, 0.35, 1200, 0.25); tone(t, 300, 0.35, { vel: 0.08, to: 1200 }); },
+    cash(t) { // cash register: drawer bell + coins
+      tone(t, 2637, 0.6, { vel: 0.12 }); tone(t + 0.01, 3520, 0.5, { vel: 0.06 });
+      for (let i = 0; i < 6; i++) tone(t + 0.12 + i * 0.05, 1800 + Math.random() * 1600, 0.12, { type: 'triangle', vel: 0.05, wet: 0.05 });
+      noiseHit(t + 0.05, 0.18, 3000, 0.12);
+    },
+    sting(t) { tone(t, hz(38), 1.4, { type: 'sawtooth', vel: 0.12, to: hz(37) }); tone(t, hz(62), 1.2, { type: 'triangle', vel: 0.08 }); },
+    win(t) {
+      [[60, 64, 67], [62, 65, 69], [64, 67, 72], [67, 72, 76]].forEach((ch, i) =>
+        ch.forEach((m) => tone(t + i * 0.22, hz(m + 12), i === 3 ? 1.4 : 0.3, { type: 'triangle', vel: 0.09 })));
+    },
+  };
+
   // Leaving the app pauses all sound; coming back resumes the music where it was.
   document.addEventListener('visibilitychange', () => {
     if (!ctx) return;
@@ -263,7 +301,21 @@
       try { localStorage.setItem('eco.muted', JSON.stringify(muted)); } catch { /* private mode */ }
       if (master) master.gain.setTargetAtTime(muted ? 0 : 0.9, ctx.currentTime, 0.05);
     },
-    // Sound effects share the context; added with the quiz.
+    // play('right' | 'wrong' | 'cash' | 'timeout' | 'second' | 'tap' | 'lock' | 'lifeline' | 'sting' | 'win')
+    play(name) {
+      if (!SFX[name]) return;
+      init();
+      if (ctx.state === 'suspended') ctx.resume();
+      SFX[name](ctx.currentTime + 0.01);
+    },
+    // Dip the music under an important moment (e.g. the answer reveal).
+    duck(on) {
+      if (!ctx || !playing) return;
+      const t = ctx.currentTime;
+      musicBus.gain.cancelScheduledValues(t);
+      musicBus.gain.setValueAtTime(musicBus.gain.value, t);
+      musicBus.gain.linearRampToValueAtTime(on ? MUSIC_LEVEL * 0.35 : MUSIC_LEVEL, t + 0.25);
+    },
     _ctx: () => init(), _sfxBus: () => (init(), sfxBus),
     // Debug: an analyser on the final mix, to measure levels from the console.
     _tap() { init(); const a = ctx.createAnalyser(); a.fftSize = 2048; master.connect(a); return a; },

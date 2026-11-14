@@ -110,7 +110,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; letter-spacing: -0.01e
   position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 50;
   transform: translate(-50%, 140%); transition: transform .35s cubic-bezier(.2, .9, .3, 1.2);
   background: var(--ink); color: var(--paper); padding: 11px 18px; border-radius: 999px;
-  font-size: .9rem; font-weight: 600; max-width: calc(100% - 32px); box-shadow: var(--shadow);
+  font-size: .9rem; font-weight: 600; width: max-content; max-width: calc(100% - 32px); box-shadow: var(--shadow);
 }
 .toast.show { transform: translate(-50%, 0); }
 

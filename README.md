@@ -18,7 +18,9 @@ shared/styles.css    tokens (paper & ink, dark mode), buttons, mascot animations
 sw.js                service worker (offline cache)
 manifest.webmanifest PWA manifest
 icons/               app icons (rendered from the mascot SVG)
-games/<id>/          one folder per game (none yet)
+games/<id>/          one folder per game
+games/quiz/          ¿Te lo llevas? — 15-step quiz ladder (questions-[a-e].js: 150 questions)
+music/               music room (tension track preview)
 docs/curriculum.md   official sources for game content (3 Bachillerato economics subjects)
 ```
 

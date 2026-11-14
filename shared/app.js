@@ -1,7 +1,7 @@
 // Shared runtime for every page: language, mascot, animations, PWA install,
 // update check. Exposed as window.Eco.
 (() => {
-  const VERSION = '0.2.2'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
+  const VERSION = '0.3.0'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
   const REPO = 'https://github.com/grojasv/economics-game';
   const LANGS = ['es', 'ca', 'en'];
   const LANG_LABEL = { es: 'ES', ca: 'CA', en: 'EN' };
@@ -166,13 +166,19 @@
       check();
       document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
     }).catch(() => { /* unsupported */ });
-    // A new version took over: reload once so the page runs the new code.
-    let reloaded = false;
+    // A new version took over: reload once so the page runs the new code, but never
+    // in the middle of a game (Eco.setBusy): then it waits until the game says it's free.
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!hadController || reloaded) return;
-      reloaded = true;
+      if (!hadController || reloadState === 'done') return;
+      if (busy) { reloadState = 'pending'; return; }
+      reloadState = 'done';
       location.reload();
     });
+  }
+  let busy = false, reloadState = 'none';
+  function setBusy(b) {
+    busy = !!b;
+    if (!busy && reloadState === 'pending') { reloadState = 'done'; location.reload(); }
   }
   addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -207,6 +213,6 @@
     applyI18n, langSwitch, store, toast,
     mascotSVG, initHosts, react, blink,
     canInstall: () => !!installEvt, onInstallable: (fn) => installListeners.push(fn), install, isStandalone, isIOS,
-    consumeJustUpdated,
+    consumeJustUpdated, setBusy,
   };
 })();

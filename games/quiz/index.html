@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>¿Te lo llevas?</title>
+  <meta name="description" content="Quiz de economía: 15 escalones, ¿te lo llevas o sigues?">
+  <meta name="theme-color" content="#f5ecd9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1711" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="icon" href="../../icons/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/styles.css">
+  <link rel="stylesheet" href="quiz.css">
+</head>
+<body>
+  <div class="wrap quiz">
+    <!-- START -->
+    <section class="screen" id="s-start">
+      <header class="bar">
+        <a class="icon-btn" href="../../" data-i18n-aria="home">←</a>
+        <div class="bar-right">
+          <button class="icon-btn" type="button" id="sound-btn" data-i18n-aria="sound"></button>
+          <div id="lang"></div>
+        </div>
+      </header>
+      <div class="start-hero">
+        <div class="start-duro" data-host id="duro-start"></div>
+        <h1 data-i18n="title"></h1>
+        <p class="start-lead" data-i18n="lead"></p>
+      </div>
+      <div class="challenge" id="challenge" hidden></div>
+      <div class="start-actions">
+        <button class="btn gold big" type="button" id="play-btn" data-i18n="play"></button>
+        <button class="btn" type="button" id="rank-btn" data-i18n="ranking"></button>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="timer-opt" checked>
+        <span data-i18n="timerOpt"></span>
+      </label>
+      <p class="fine" id="timer-note" data-i18n="timerNote" hidden></p>
+      <details class="rules">
+        <summary data-i18n="howTo"></summary>
+        <ul>
+          <li data-i18n="r1"></li>
+          <li data-i18n="r2"></li>
+          <li data-i18n="r3"></li>
+          <li data-i18n="r4"></li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- QUESTION -->
+    <section class="screen" id="s-play" hidden>
+      <header class="bar">
+        <button class="icon-btn" type="button" id="quit-btn" data-i18n-aria="quit">✕</button>
+        <div class="stake">
+          <span class="stake-step" id="stake-step"></span>
+          <b class="stake-prize" id="stake-prize"></b>
+        </div>
+        <button class="icon-btn" type="button" id="sound-btn-2" data-i18n-aria="sound"></button>
+      </header>
+      <ol class="ladder" id="ladder" aria-hidden="true"></ol>
+      <div class="timer" id="timer" hidden><span id="timer-fill"></span><b id="timer-num"></b></div>
+      <div class="qcard">
+        <div class="qmeta"><span class="chip" id="q-cat"></span><span class="mini-duro" data-host id="duro-play"></span></div>
+        <p class="qtext" id="q-text"></p>
+      </div>
+      <div class="answers" id="answers"></div>
+      <div class="tools">
+        <div class="lifelines">
+          <button class="life" type="button" id="ll-5050"><span>50:50</span></button>
+          <button class="life" type="button" id="ll-duro" data-i18n-aria="llDuro"><span>🪙</span></button>
+          <button class="life" type="button" id="ll-market" data-i18n-aria="llMarket"><span>📊</span></button>
+        </div>
+        <button class="btn cash" type="button" id="cash-btn"></button>
+      </div>
+    </section>
+
+    <!-- END -->
+    <section class="screen" id="s-end" hidden>
+      <div class="end-hero">
+        <div class="end-duro" data-host id="duro-end"></div>
+        <p class="end-kicker" id="end-kicker"></p>
+        <p class="end-prize" id="end-prize"></p>
+        <p class="end-sub" id="end-sub"></p>
+      </div>
+      <form class="name-form" id="name-form" autocomplete="off">
+        <label for="name-in" data-i18n="yourName"></label>
+        <div class="name-row">
+          <input id="name-in" maxlength="16" required enterkeyhint="done">
+          <button class="btn gold" type="submit" data-i18n="saveShare"></button>
+        </div>
+        <p class="fine" id="unranked" data-i18n="unranked" hidden></p>
+      </form>
+      <div class="end-actions">
+        <button class="btn" type="button" id="again-btn" data-i18n="again"></button>
+        <button class="btn" type="button" id="end-rank-btn" data-i18n="ranking"></button>
+        <a class="btn" href="../../" data-i18n="home"></a>
+      </div>
+    </section>
+  </div>
+
+  <!-- Duro's hint: floats over the screen, tap to close -->
+  <button type="button" class="bubble-hint" id="hint" hidden></button>
+
+  <!-- Explanation sheet -->
+  <div class="reveal" id="reveal" hidden>
+    <div class="reveal-box">
+      <p class="reveal-title" id="reveal-title"></p>
+      <p class="reveal-why" id="reveal-why"></p>
+      <p class="reveal-tag" id="reveal-tag"></p>
+      <button class="btn gold big" type="button" id="next-btn"></button>
+    </div>
+  </div>
+
+  <!-- Ranking -->
+  <dialog class="sheet" id="rank-sheet" aria-labelledby="rank-title">
+    <div class="sheet-head">
+      <h2 id="rank-title" data-i18n="ranking"></h2>
+      <button class="icon-btn" type="button" id="rank-close" data-i18n-aria="close">✕</button>
+    </div>
+    <div class="sheet-body"><ol class="rank" id="rank-list"></ol></div>
+  </dialog>
+
+  <!-- Quit confirm -->
+  <dialog class="sheet small" id="quit-sheet">
+    <div class="sheet-body">
+      <p class="quit-q" data-i18n="quitQ"></p>
+      <div class="end-actions">
+        <button class="btn" type="button" id="quit-no" data-i18n="quitNo"></button>
+        <button class="btn danger" type="button" id="quit-yes" data-i18n="quitYes"></button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="questions-a.js"></script>
+  <script src="questions-b.js"></script>
+  <script src="questions-c.js"></script>
+  <script src="questions-d.js"></script>
+  <script src="questions-e.js"></script>
+  <script src="../../shared/app.js"></script>
+  <script src="../../shared/audio.js"></script>
+  <script src="quiz.js"></script>
+</body>
+</html>

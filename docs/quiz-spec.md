@@ -1,4 +1,4 @@
-# ¿Te lo llevas? — quiz game spec (draft v1)
+# ¿Te lo llevas? — quiz game spec (v1, built in 0.3.0)
 
 Working title. CA: *T'ho emportes?* · EN: *Cash Out?* Folder `games/quiz/`. Hosted by Duro.
 
@@ -14,8 +14,8 @@ Decisions agreed with Guille on 2026-11-14 are marked ✅. Defaults I picked are
 
 ## Lifelines (each once per run)
 - ✅ **50:50:** removes two wrong answers.
-- ✅ **Ask Duro:** a hint about the concept, never the answer.
-- ✅ **Ask the market:** a crowd vote shown as bars. ◻️ The crowd is right about 85% of the time on easy steps, 65% on medium and 45% on hard, and Duro reminds you that markets can be wrong.
+- ✅ **Ask Duro:** a hint about the concept, never the answer. Built as a speech bubble floating over the screen (tap to close), so it never pushes the answers off a small phone.
+- ✅ **Ask the market:** a crowd vote, built as a fill behind each answer plus a percentage (no extra height). ◻️ The crowd is right about 85% of the time on easy steps, 65% on medium and 45% on hard, and Duro reminds you that markets can be wrong.
 
 ## Timer
 - ✅ 30 s on steps 1–10, 45 s on steps 11–15. Time out = wrong answer.
