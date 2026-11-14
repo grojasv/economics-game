@@ -4,6 +4,10 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
+## [0.2.2] — 2026-11-14
+### Fixed
+- Entrance animation (`.rise`): content is visible by default and the animation only fades it in (`animation-fill-mode: backwards`). Before, it started at `opacity: 0` and depended on the animation to appear, so a browser that skipped or paused the animation (and screenshots taken on load) showed an empty hub. Service worker cache `eco-v4`.
+
 ## [0.2.1] — 2026-11-14
 ### Fixed
 Found by a review pass that measured the music on the final mix (an analyser tap, `EcoAudio._tap()`):

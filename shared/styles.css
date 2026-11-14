@@ -101,8 +101,9 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; letter-spacing: -0.01e
 @keyframes wobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
 
 /* ---------- entrance ---------- */
-.rise { opacity: 0; transform: translateY(14px); animation: rise .6s cubic-bezier(.2, .8, .2, 1) forwards; animation-delay: calc(var(--i, 0) * 90ms + 80ms); }
-@keyframes rise { to { opacity: 1; transform: none; } }
+/* Visible by default; the animation only fades it in (if it never runs, content still shows). */
+.rise { animation: rise .6s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: calc(var(--i, 0) * 90ms + 80ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 
 /* ---------- toast ---------- */
 .toast {
