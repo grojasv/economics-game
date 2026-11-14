@@ -6,7 +6,9 @@ The player-facing version of this list lives in `news.js` (hub → 🗞️ *What
 
 ## [0.2.2] — 2026-11-14
 ### Fixed
-- Entrance animation (`.rise`): content is visible by default and the animation only fades it in (`animation-fill-mode: backwards`). Before, it started at `opacity: 0` and depended on the animation to appear, so a browser that skipped or paused the animation (and screenshots taken on load) showed an empty hub. Service worker cache `eco-v4`.
+- Entrance animation (`.rise`): content is visible by default and the animation only fades it in (`animation-fill-mode: backwards`). Before, it started at `opacity: 0` and needed the animation to run to appear, so where animations are switched off (`animation: none`) the hub stayed empty. Service worker cache `eco-v4`.
+### Note
+- In a hidden preview pane, the page's animation clock does not advance, so screenshots there show the hub's top section blank. Real browsers are not affected; every `.rise` animation finishes at full opacity.
 
 ## [0.2.1] — 2026-11-14
 ### Fixed
