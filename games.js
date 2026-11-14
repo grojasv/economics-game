@@ -14,15 +14,4 @@ window.ECO_GAMES = [
       en: '15 questions, the prize doubles. Cash out or keep going?',
     },
   },
-  {
-    id: 'soon-1',
-    status: 'soon',
-    icon: '📈',
-    name: { es: 'Próximamente', ca: 'Aviat', en: 'Coming soon' },
-    tagline: {
-      es: 'Duro ya está acuñando el siguiente juego.',
-      ca: 'En Duro ja està encunyant el pròxim joc.',
-      en: 'Duro is already minting the next game.',
-    },
-  },
 ];

@@ -4,6 +4,10 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
+## [0.3.2] — 2026-11-14
+### Changed
+- Hub: the *Coming soon* card is gone; *¿Te lo llevas?* is the only game on the hub. Service worker cache `eco-v7`.
+
 ## [0.3.1] — 2026-11-14
 ### Fixed
 - **Sharing on phones:** *Save & share* drew the card image (fonts, Duro, canvas) before calling `navigator.share`. Browsers, and Safari above all, only allow sharing and the clipboard right after a tap, so on an iPhone the share could be refused. The card is now drawn before the tap (when the end screen opens, with the remembered name, and again as the name is typed), and the tap calls `share()` immediately. Checked that the share call happens synchronously inside the submit and carries the PNG. Not yet tried on a real iPhone.
