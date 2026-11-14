@@ -4,6 +4,13 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
+## [0.3.1] — 2026-11-14
+### Fixed
+- **Sharing on phones:** *Save & share* drew the card image (fonts, Duro, canvas) before calling `navigator.share`. Browsers, and Safari above all, only allow sharing and the clipboard right after a tap, so on an iPhone the share could be refused. The card is now drawn before the tap (when the end screen opens, with the remembered name, and again as the name is typed), and the tap calls `share()` immediately. Checked that the share call happens synchronously inside the submit and carries the PNG. Not yet tried on a real iPhone.
+### Tested
+- The explanation sheet, in its worst case (a wrong answer adds "The answer was …"), fits a 320×568 screen for all 150 questions in all 3 languages: the tallest is 388 px (e-23), and its top edge is 164 px from the top of the screen. The end screen fits too.
+- Service worker cache `eco-v6`.
+
 ## [0.3.0] — 2026-11-14
 ### Added
 - **¿Te lo llevas?** (`games/quiz/`, CA *T'ho emportes?*, EN *Cash Out?*), the first game, built to `docs/quiz-spec.md`:
@@ -25,7 +32,7 @@ The player-facing version of this list lives in `news.js` (hub → 🗞️ *What
 - The money format is consistent: the browser's Spanish format writes "1600 €" but "12.800 €"; it is now always "1.600 €" (and "€1,600" in English).
 - The toast is as wide as its text (it used to shrink to a narrow column).
 ### Tested
-- Played full runs with real clicks: winning all 15 steps, falling at steps 3, 7 and 12 (0 € / 1,600 € / 51,200 €), cashing out at step 4 (400 €), all three helps, timer expiry, saving, ranking, the share card, and challenge links (including injected HTML and an inflated score). No script errors.
+- Played full runs in the browser with scripted clicks (not by hand): winning all 15 steps, falling at steps 3, 7 and 12 (0 € / 1,600 € / 51,200 €), cashing out at step 4 (400 €), all three helps, timer expiry, saving, ranking, the share card, and challenge links (including injected HTML and an inflated score). No script errors.
 - Layout: every question in every language (450 renders) fits a 320×568 screen with all answers and the cash-out button visible, with the market vote shown (worst case 556 px).
 - Service worker cache `eco-v5`; the quiz files are precached.
 

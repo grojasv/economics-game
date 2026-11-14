@@ -1,7 +1,7 @@
 // Shared runtime for every page: language, mascot, animations, PWA install,
 // update check. Exposed as window.Eco.
 (() => {
-  const VERSION = '0.3.0'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
+  const VERSION = '0.3.1'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
   const REPO = 'https://github.com/grojasv/economics-game';
   const LANGS = ['es', 'ca', 'en'];
   const LANG_LABEL = { es: 'ES', ca: 'CA', en: 'EN' };

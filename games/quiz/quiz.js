@@ -424,6 +424,7 @@
     $('unranked').hidden = run.timed;
     run.saved = false;
     show('s-end');
+    prepareCard();             // draw the share card now, with the remembered name
     setTimeout(() => {
       if (kind === 'win') { A.play('win'); E.react($('duro-end'), 'flip'); }
       else if (kind === 'cash') { E.react($('duro-end'), 'hop'); }
@@ -462,13 +463,27 @@
   $('rank-sheet').addEventListener('click', (e) => { if (e.target === $('rank-sheet')) $('rank-sheet').close(); });
 
   // ---------- save & share ----------
-  $('name-form').addEventListener('submit', async (e) => {
+  // Browsers (Safari above all) only allow share() and the clipboard right after a tap, so
+  // the card image is drawn BEFORE the tap: when the end screen opens and as the name is typed.
+  const cleanName = () => $('name-in').value.trim().replace(/\s+/g, ' ').slice(0, 16);
+  let card = { name: null, file: null }, cardTimer = 0;
+  function prepareCard() {
+    clearTimeout(cardTimer);
+    cardTimer = setTimeout(async () => {
+      const name = cleanName(), forRun = run;
+      if (!name || !forRun || (card.name === name && card.run === forRun)) return;
+      try { const file = await cardFile(name); if (cleanName() === name && run === forRun) card = { name, file, run: forRun }; } catch { /* text-only share */ }
+    }, 250);
+  }
+  $('name-in').addEventListener('input', prepareCard);
+
+  $('name-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = $('name-in').value.trim().replace(/\s+/g, ' ').slice(0, 16);
+    const name = cleanName();
     if (!name) return;
     E.store.set('quiz.name', name);
     if (run.timed && !run.saved) { lastSavedId = saveScore(name); run.saved = true; E.toast('🏆 ' + E.t('saved')); }
-    await share(name);
+    share(name);              // no await before this: it must run inside the tap
   });
 
   function shareURL(name) {
@@ -477,25 +492,25 @@
     return u.toString();
   }
 
-  async function share(name) {
+  // Synchronous up to the share()/clipboard call, so the tap still counts.
+  function share(name) {
     const url = shareURL(name);
     const text = fill('shareText', { n: name, p: money(run.banked), s: run.reached });
-    let file = null;
-    try { file = await cardFile(name); } catch { /* fall back to text */ }
-    try {
-      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], text: `${text} ${url}` });
-        return;
+    const file = card.name === name && card.run === run ? card.file : null;
+    const fallback = () => {   // desktop: copy the link, download the card
+      const copy = navigator.clipboard ? navigator.clipboard.writeText(`${text} ${url}`) : Promise.reject();
+      copy.then(() => E.toast('🔗 ' + E.t('copied'))).catch(() => {});
+      if (file) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(file); a.download = file.name; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
       }
-      if (navigator.share) { await navigator.share({ text, url }); return; }
-    } catch (err) { if (err && err.name === 'AbortError') return; }
-    // Desktop fallback: download the card and copy the link
-    if (file) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(file); a.download = file.name; a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    }
-    try { await navigator.clipboard.writeText(`${text} ${url}`); E.toast('🔗 ' + E.t('copied')); } catch { /* no clipboard */ }
+    };
+    let p = null;
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) p = navigator.share({ files: [file], text: `${text} ${url}` });
+    else if (navigator.share) p = navigator.share({ text, url });
+    if (!p) return fallback();
+    p.catch((err) => { if (!err || err.name !== 'AbortError') fallback(); });
   }
 
   // Share card: 1080×1350, paper & ink, Duro, name, prize, step.
@@ -539,6 +554,7 @@
   // ---------- language change mid-run ----------
   E.onLang(() => {
     renderChallenge();
+    if (run && !$('s-end').hidden) { card = { name: null, file: null }; prepareCard(); }   // the card's text follows the language
     if (run && !$('s-play').hidden) {
       $('stake-step').textContent = `${E.t('step')} ${run.step}/15 · ${E.t('forPrize')}`;
       $('stake-prize').textContent = money(prize(run.step));
@@ -559,5 +575,8 @@
       $('stake-prize').textContent = money(prize(step));
       renderQuestion(); renderTools();
     },
+    // Open the explanation sheet for q (worst case: a wrong answer adds "The answer was: …").
+    reveal(q, ok = false, step = 7) { run.step = step; run.q = q; openReveal(ok, false); },
+    get card() { return card; },
   };
 })();
