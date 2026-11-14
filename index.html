@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Economics Game</title>
+  <meta name="description" content="Juegos de economía para adultos — economics games (ES / CA / EN).">
+  <meta name="theme-color" content="#f5ecd9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1711" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared/styles.css">
+  <style>
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 0 6px; }
+    .brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
+    .brand b { font-family: var(--serif); font-size: 1.25rem; font-weight: 800; }
+    .brand small { font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+
+    .hero { display: grid; grid-template-columns: minmax(110px, 200px) 1fr; align-items: center; gap: 18px; padding: 18px 0 8px; }
+    .hero .mascot { width: 100%; max-width: 200px; }
+    .bubble {
+      position: relative; background: var(--card); border: 1.5px solid var(--ink); border-radius: 16px;
+      padding: 14px 16px; box-shadow: 3px 3px 0 var(--ink); font-size: .98rem; line-height: 1.45;
+    }
+    .bubble::before {
+      content: ''; position: absolute; left: -10px; top: 34px; width: 16px; height: 16px; background: var(--card);
+      border-left: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); transform: rotate(45deg);
+    }
+    .bubble h1 { font-size: clamp(1.45rem, 5vw, 2.1rem); line-height: 1.1; margin-bottom: 6px; }
+    .bubble p { margin: 0; color: var(--ink-soft); }
+
+    .section-title { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; font-family: var(--serif); font-size: 1.05rem; }
+    .section-title::after { content: ''; flex: 1; border-top: 1.5px solid var(--ink); opacity: .7; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 16px; }
+    .card {
+      position: relative; display: flex; flex-direction: column; gap: 8px; min-height: 170px; padding: 18px;
+      background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--radius); box-shadow: 4px 4px 0 var(--ink);
+      text-decoration: none; color: inherit; overflow: hidden; cursor: pointer; text-align: left;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .card:hover { transform: translate(-2px, -2px) rotate(-.4deg); box-shadow: 6px 6px 0 var(--ink); }
+    .card .icon { font-size: 2.2rem; line-height: 1; }
+    .card h3 { font-size: 1.2rem; }
+    .card p { margin: 0; color: var(--ink-soft); font-size: .9rem; line-height: 1.4; }
+    .card.soon { background: repeating-linear-gradient(-45deg, var(--card) 0 14px, var(--paper-2) 14px 28px); }
+    .card.soon .icon { filter: grayscale(.5); opacity: .75; }
+    .stamp {
+      position: absolute; right: 12px; top: 16px; transform: rotate(9deg);
+      font-family: var(--serif); font-weight: 800; font-size: .75rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--red-ink); border: 2.5px solid var(--red-ink); border-radius: 6px; padding: 4px 8px; opacity: .85;
+      mix-blend-mode: multiply;
+    }
+    @media (prefers-color-scheme: dark) { .stamp { mix-blend-mode: normal; } }
+    .card.soon:hover .stamp { animation: stamp .4s ease; }
+    @keyframes stamp { 0% { transform: rotate(9deg) scale(1); } 40% { transform: rotate(9deg) scale(1.25); } 100% { transform: rotate(9deg) scale(1); } }
+
+    .install {
+      display: none; align-items: center; gap: 12px; margin-top: 22px; padding: 12px 14px;
+      border: 1.5px dashed var(--ink); border-radius: var(--radius); background: color-mix(in srgb, var(--gold-soft) 35%, var(--card));
+    }
+    .install.show { display: flex; }
+    .install p { margin: 0; flex: 1; font-size: .9rem; line-height: 1.35; }
+
+    footer { margin-top: 40px; padding: 16px 0 calc(22px + env(safe-area-inset-bottom)); border-top: 1.5px solid var(--ink); font-size: .82rem; color: var(--ink-soft); }
+    footer .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; }
+    footer button { background: none; border: 0; padding: 4px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; color: inherit; }
+    footer .version { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+
+    .news { list-style: none; margin: 0; padding: 0; }
+    .news li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 14px 0; border-bottom: 1px dashed var(--rule); }
+    .news li:last-child { border-bottom: 0; }
+    .news .e { font-size: 1.5rem; line-height: 1; }
+    .news .meta { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+    .news p { margin: 4px 0 0; line-height: 1.45; }
+    .sheet-foot { margin-top: 10px; font-size: .85rem; }
+
+    @media (max-width: 420px) {
+      .hero { grid-template-columns: 104px 1fr; gap: 14px; }
+      .bubble { padding: 12px 13px; font-size: .92rem; }
+      .bubble::before { top: 26px; }
+      .brand small { display: none; }
+      .brand b { font-size: 1.05rem; }
+      .top-actions { gap: 6px; }
+      .lang-switch button { padding: 6px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="./"><b data-i18n="title">Economics Game</b><small data-i18n="kicker">beta</small></a>
+      <div class="top-actions">
+        <button class="icon-btn" id="news-btn" type="button" data-i18n-aria="whatsNew">🗞️</button>
+        <div id="lang"></div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="rise" style="--i:0"><div class="mascot" data-host id="mascot"></div></div>
+      <div class="bubble rise" style="--i:1">
+        <h1 data-i18n="hello"></h1>
+        <p data-i18n="intro"></p>
+      </div>
+    </section>
+
+    <div class="install" id="install">
+      <span style="font-size:1.6rem">📲</span>
+      <p id="install-text"></p>
+      <button class="btn gold" id="install-btn" type="button" data-i18n="install"></button>
+    </div>
+
+    <h2 class="section-title rise" style="--i:2" data-i18n="games"></h2>
+    <div class="grid" id="grid"></div>
+
+    <footer>
+      <div class="row">
+        <span class="version" id="version"></span>
+        <span aria-hidden="true">·</span>
+        <button type="button" id="news-link" data-i18n="whatsNew"></button>
+        <span aria-hidden="true">·</span>
+        <a id="changelog-link" target="_blank" rel="noopener" data-i18n="changelog"></a>
+      </div>
+    </footer>
+  </div>
+
+  <dialog class="sheet" id="news-sheet" aria-labelledby="news-title">
+    <div class="sheet-head">
+      <h2 id="news-title" data-i18n="whatsNew"></h2>
+      <button class="icon-btn" type="button" id="news-close" data-i18n-aria="close">✕</button>
+    </div>
+    <div class="sheet-body">
+      <ul class="news" id="news-list"></ul>
+      <p class="sheet-foot"><a id="changelog-link-2" target="_blank" rel="noopener" data-i18n="fullChangelog"></a></p>
+    </div>
+  </dialog>
+
+  <script src="games.js"></script>
+  <script src="news.js"></script>
+  <script src="shared/app.js"></script>
+  <script>
+    const E = window.Eco;
+    E.dict({
+      title: { es: 'Juego de Economía', ca: "Joc d'Economia", en: 'Economics Game' },
+      kicker: { es: 'beta', ca: 'beta', en: 'beta' },
+      hello: { es: 'Hola, soy Duro.', ca: 'Hola, sóc en Duro.', en: "Hi, I'm Duro." },
+      intro: {
+        es: 'Una moneda con opiniones. Aquí aprenderemos economía jugando: decisiones, precios, riesgos y alguna que otra burbuja.',
+        ca: 'Una moneda amb opinions. Aquí aprendrem economia jugant: decisions, preus, riscos i alguna bombolla.',
+        en: 'A coin with opinions. Here we learn economics by playing: choices, prices, risk and the odd bubble.',
+      },
+      games: { es: 'Juegos', ca: 'Jocs', en: 'Games' },
+      whatsNew: { es: 'Novedades', ca: 'Novetats', en: "What's new" },
+      changelog: { es: 'Registro de cambios', ca: 'Registre de canvis', en: 'Changelog' },
+      fullChangelog: { es: 'Ver el registro técnico completo →', ca: 'Veure el registre tècnic complet →', en: 'See the full technical changelog →' },
+      close: { es: 'Cerrar', ca: 'Tancar', en: 'Close' },
+      install: { es: 'Instalar', ca: 'Instal·lar', en: 'Install' },
+      installText: { es: 'Instálalo como app: abre más rápido y funciona sin conexión.', ca: "Instal·la-ho com a app: s'obre més ràpid i funciona sense connexió.", en: 'Install it as an app: opens faster and works offline.' },
+      installIOS: { es: 'En iPhone: Compartir → «Añadir a pantalla de inicio».', ca: "A l'iPhone: Compartir → «Afegir a la pantalla d'inici».", en: 'On iPhone: Share → “Add to Home Screen”.' },
+      soonTap: { es: 'Todavía en la ceca. ¡Paciencia!', ca: 'Encara a la seca. Paciència!', en: 'Still at the mint. Patience!' },
+      updated: { es: 'Actualizado a la versión', ca: 'Actualitzat a la versió', en: 'Updated to version' },
+      soonStamp: { es: 'Próximamente', ca: 'Aviat', en: 'Coming soon' },
+    });
+
+    // Mascot
+    const mascot = document.getElementById('mascot');
+    mascot.innerHTML = E.mascotSVG('happy');
+    E.initHosts();
+    E.langSwitch(document.getElementById('lang'));
+
+    // Games grid
+    const grid = document.getElementById('grid');
+    function renderGrid() {
+      grid.innerHTML = window.ECO_GAMES.map((g, i) => {
+        const inner = `<span class="icon">${g.icon}</span><h3>${E.t(g.name)}</h3><p>${E.t(g.tagline)}</p>`;
+        return g.status === 'live'
+          ? `<a class="card rise" style="--i:${i + 3}" href="${g.path}">${inner}</a>`
+          : `<button type="button" class="card soon rise" style="--i:${i + 3}" data-soon>${inner}<span class="stamp">${E.t('soonStamp')}</span></button>`;
+      }).join('');
+    }
+    renderGrid();
+    grid.addEventListener('click', (e) => {
+      if (!e.target.closest('[data-soon]')) return;
+      E.react(mascot, 'wobble');
+      E.toast('🪙 ' + E.t('soonTap'));
+    });
+
+    // Footer: version + changelog
+    document.getElementById('version').textContent = 'v' + E.VERSION;
+    const changelogURL = E.REPO + '/blob/main/CHANGELOG.md';
+    document.getElementById('changelog-link').href = changelogURL;
+    document.getElementById('changelog-link-2').href = changelogURL;
+
+    // What's new
+    const news = window.ECO_NEWS || [];
+    const newsBtn = document.getElementById('news-btn');
+    const sheet = document.getElementById('news-sheet');
+    const latestId = news.reduce((m, n) => Math.max(m, n.id), 0);
+    function renderNews() {
+      document.getElementById('news-list').innerHTML = news.map((n) => `
+        <li><span class="e">${n.emoji}</span><div>
+          <div class="meta">v${n.version} · ${new Date(n.date + 'T12:00').toLocaleDateString(E.lang, { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          <p>${E.t(n.text)}</p></div></li>`).join('');
+    }
+    function renderDot() {
+      newsBtn.querySelector('.dot')?.remove();
+      if (latestId > E.store.get('newsSeen', 0)) newsBtn.insertAdjacentHTML('beforeend', '<span class="dot"></span>');
+    }
+    function openNews() {
+      renderNews();
+      sheet.showModal();
+      E.store.set('newsSeen', latestId);
+      renderDot();
+    }
+    newsBtn.addEventListener('click', openNews);
+    document.getElementById('news-link').addEventListener('click', openNews);
+    document.getElementById('news-close').addEventListener('click', () => sheet.close());
+    sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.close(); });
+    renderDot();
+
+    // Install
+    const install = document.getElementById('install');
+    const installText = document.getElementById('install-text');
+    const installBtn = document.getElementById('install-btn');
+    function renderInstall() {
+      if (E.isStandalone()) { install.classList.remove('show'); return; }
+      if (E.canInstall()) {
+        installText.textContent = E.t('installText'); installBtn.hidden = false; install.classList.add('show');
+      } else if (E.isIOS()) {
+        installText.textContent = E.t('installIOS'); installBtn.hidden = true; install.classList.add('show');
+      } else install.classList.remove('show');
+    }
+    E.onInstallable(renderInstall);
+    installBtn.addEventListener('click', () => E.install());
+    renderInstall();
+
+    E.onLang(() => { renderGrid(); renderInstall(); if (sheet.open) renderNews(); });
+
+    // Just updated? Say so once.
+    if (E.consumeJustUpdated()) {
+      setTimeout(() => { E.react(mascot, 'flip'); E.toast(`✨ ${E.t('updated')} ${E.VERSION}`); }, 700);
+    }
+  </script>
+</body>
+</html>
