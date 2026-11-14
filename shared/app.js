@@ -1,7 +1,7 @@
 // Shared runtime for every page: language, mascot, animations, PWA install,
 // update check. Exposed as window.Eco.
 (() => {
-  const VERSION = '0.3.2'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
+  const VERSION = '0.3.3'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
   const REPO = 'https://github.com/grojasv/economics-game';
   const LANGS = ['es', 'ca', 'en'];
   const LANG_LABEL = { es: 'ES', ca: 'CA', en: 'EN' };
@@ -204,7 +204,13 @@
     return !!lastSeen && lastSeen !== VERSION;
   }
 
-  document.addEventListener('DOMContentLoaded', () => { applyI18n(); initHosts(); });
+  // Fail-safe for the fade-in: if the browser doesn't run the animation (some phones, power
+  // saving, pages opened in the background), content must not stay invisible. After 1.5 s the
+  // .rise class is removed whatever happened, so everything is shown.
+  function settle(root = document) {
+    setTimeout(() => root.querySelectorAll('.rise').forEach((el) => el.classList.remove('rise')), 1500);
+  }
+  document.addEventListener('DOMContentLoaded', () => { applyI18n(); initHosts(); settle(); });
 
   window.Eco = {
     VERSION, REPO, LANGS,
@@ -213,6 +219,6 @@
     applyI18n, langSwitch, store, toast,
     mascotSVG, initHosts, react, blink,
     canInstall: () => !!installEvt, onInstallable: (fn) => installListeners.push(fn), install, isStandalone, isIOS,
-    consumeJustUpdated, setBusy,
+    consumeJustUpdated, setBusy, settle,
   };
 })();

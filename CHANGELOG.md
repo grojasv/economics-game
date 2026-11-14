@@ -4,6 +4,10 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
+## [0.3.3] — 2026-11-14
+### Fixed
+- **The hub could show no game.** The greeting and the game cards fade in (`.rise`). Where the browser does not run that animation, they stayed invisible: the hub showed only the install tip and the footer. Seen on the live hub in a preview browser; this is the likely reason the game didn't show up on a phone. Now `Eco.settle()` removes the fade-in after 1.5 s whatever happened, so content always appears. Re-renders after a language change no longer fade in. Service worker cache `eco-v8`.
+
 ## [0.3.2] — 2026-11-14
 ### Changed
 - Hub: the *Coming soon* card is gone; *¿Te lo llevas?* is the only game on the hub. Service worker cache `eco-v7`.

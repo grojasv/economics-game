@@ -178,15 +178,19 @@
 
     // Games grid
     const grid = document.getElementById('grid');
+    let firstGrid = true;
     function renderGrid() {
+      const rise = firstGrid ? 'rise' : '';
+      firstGrid = false;
       grid.innerHTML = window.ECO_GAMES.map((g, i) => {
         const inner = `<span class="icon">${g.icon}</span><h3>${E.t(g.name)}</h3><p>${E.t(g.tagline)}</p>`;
         return g.status === 'live'
-          ? `<a class="card rise" style="--i:${i + 3}" href="${g.path}">${inner}</a>`
-          : `<button type="button" class="card soon rise" style="--i:${i + 3}" data-soon>${inner}<span class="stamp">${E.t('soonStamp')}</span></button>`;
+          ? `<a class="card ${rise}" style="--i:${i + 3}" href="${g.path}">${inner}</a>`
+          : `<button type="button" class="card soon ${rise}" style="--i:${i + 3}" data-soon>${inner}<span class="stamp">${E.t('soonStamp')}</span></button>`;
       }).join('');
     }
     renderGrid();
+    E.settle(grid);
     grid.addEventListener('click', (e) => {
       if (!e.target.closest('[data-soon]')) return;
       E.react(mascot, 'wobble');
