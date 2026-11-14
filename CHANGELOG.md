@@ -4,10 +4,18 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
-## [Unreleased]
+## [0.2.0] — 2026-11-14
 ### Added
+- **Tension music** for *¿Te lo llevas?* (`shared/audio.js`, `window.EcoAudio`), generated with Web Audio, no audio files:
+  - D minor, 8-bar loop Dm – Bb – Gm – A: every phrase ends on the dominant and never resolves.
+  - Layers: a pad that swells and closes, a bass ostinato with a Phrygian half-step (D–Eb), a clock tick, a heartbeat kick, and a pluck arpeggio with a dotted delay, all through a generated reverb and a compressor.
+  - `music.setIntensity(0…1)` (step 1 → 15): tempo 92 → 114 BPM, filters open, the tick goes from quarters to eighths, the heartbeat enters from step 4, the arpeggio from step 7 and an octave higher from step 14.
+  - `music.setDanger(true)` (last seconds of the timer): +10 BPM, sixteenth ticks, a double heartbeat, high stabs and a beating high drone.
+  - Mute is remembered (`eco.muted`); music starts only after a tap (autoplay rules).
+- **Music room** (`music/`, linked from the hub footer): play/stop, a step slider 1–15 with its prize, *Last seconds* and mute, and the list of layers playing.
 - `docs/quiz-spec.md`: draft spec of the first game, *¿Te lo llevas?* (a 15-step quiz ladder with cash-out, lifelines, timer, a ranking on the device and a share card).
 - `docs/curriculum.md`: the official sources for game content — the three economics subjects of Bachillerato (Real Decreto 243/2022, Annex II): Economía (1º), Economía, Emprendimiento y Actividad Empresarial (1º) and Empresa y Diseño de Modelos de Negocio (2º), with subject codes for tagging and a draft map to game ideas.
+- `PRECACHE` adds `shared/audio.js` and `music/index.html`; service worker cache `eco-v2`.
 
 ## [0.1.0] — 2026-11-14
 ### Added

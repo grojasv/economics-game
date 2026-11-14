@@ -2,7 +2,7 @@
 // version shows on the next open; the cache is the fallback offline or after NET_TIMEOUT.
 // Images and fonts come from the cache straight away and refresh in the background.
 // Every release: bump CACHE here and VERSION in shared/app.js. Add new files to PRECACHE.
-const CACHE = 'eco-v1';
+const CACHE = 'eco-v2';
 const NET_TIMEOUT = 3000;
 const PRECACHE = [
   './',
@@ -11,6 +11,8 @@ const PRECACHE = [
   './news.js',
   './manifest.webmanifest',
   './shared/app.js',
+  './shared/audio.js',
+  './music/index.html',
   './shared/styles.css',
   './icons/apple-touch-icon.png',
   './icons/favicon-32.png',

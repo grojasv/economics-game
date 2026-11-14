@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Music Room</title>
+  <meta name="theme-color" content="#f5ecd9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1711" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../icons/favicon-32.png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/styles.css">
+  <style>
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 0 6px; }
+    .top a { font-weight: 700; text-decoration: none; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.1rem); margin: 18px 0 6px; }
+    .lead { color: var(--ink-soft); margin: 0 0 18px; line-height: 1.45; }
+    .panel { background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--radius); box-shadow: 4px 4px 0 var(--ink); padding: 18px; display: grid; gap: 18px; }
+    .stage { display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; }
+    .stage [data-host] { width: 96px; }
+    .play { font-size: 1.05rem; padding: 12px 22px; }
+    label.row { display: grid; gap: 8px; font-weight: 600; }
+    .step-out { font-family: var(--serif); font-size: 1.6rem; font-weight: 800; }
+    .step-out small { font-family: var(--sans); font-size: .85rem; font-weight: 600; color: var(--ink-soft); margin-left: 8px; }
+    input[type=range] { width: 100%; accent-color: var(--gold); height: 32px; }
+    .toggles { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn[aria-pressed="true"] { background: var(--red-ink); color: #fff; }
+    .btn.mute[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+    .layers { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: .9rem; }
+    .layers li { display: flex; gap: 8px; align-items: center; opacity: .4; transition: opacity .3s; }
+    .layers li.on { opacity: 1; }
+    .layers li::before { content: '○'; }
+    .layers li.on::before { content: '●'; color: var(--gold); }
+    [data-host].beat { animation: beat .18s ease-out; }
+    @keyframes beat { 50% { transform: scale(1.06); } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a href="../" data-i18n="back">← Inicio</a>
+      <div id="lang"></div>
+    </header>
+
+    <h1 data-i18n="title"></h1>
+    <p class="lead" data-i18n="lead"></p>
+
+    <div class="panel">
+      <div class="stage">
+        <div data-host id="duro"></div>
+        <div><button class="btn gold play" id="play" type="button"></button></div>
+      </div>
+
+      <label class="row">
+        <span class="step-out"><span id="step-n">1</span>/15<small id="prize"></small></span>
+        <input type="range" id="step" min="1" max="15" value="1" data-i18n-aria="stepAria">
+      </label>
+
+      <div class="toggles">
+        <button class="btn" id="danger" type="button" aria-pressed="false" data-i18n="danger"></button>
+        <button class="btn mute" id="mute" type="button" aria-pressed="false" data-i18n="mute"></button>
+      </div>
+
+      <ul class="layers" id="layers"></ul>
+    </div>
+  </div>
+
+  <script src="../shared/app.js"></script>
+  <script src="../shared/audio.js"></script>
+  <script>
+    const E = window.Eco, A = window.EcoAudio;
+    E.dict({
+      back: { es: '← Inicio', ca: '← Inici', en: '← Home' },
+      title: { es: 'Sala de música', ca: 'Sala de música', en: 'Music room' },
+      lead: {
+        es: 'La música de «¿Te lo llevas?». Sube el escalón para oír cómo crece la tensión, y activa «Últimos segundos» para el final del reloj.',
+        ca: 'La música de «T\'ho emportes?». Puja l\'esglaó per sentir com creix la tensió, i activa «Últims segons» per al final del rellotge.',
+        en: 'The music of “Cash Out?”. Raise the step to hear the tension grow, and switch on “Last seconds” for the end of the timer.',
+      },
+      play: { es: '▶ Escuchar', ca: '▶ Escoltar', en: '▶ Listen' },
+      stop: { es: '■ Parar', ca: '■ Aturar', en: '■ Stop' },
+      danger: { es: '⏱️ Últimos segundos', ca: '⏱️ Últims segons', en: '⏱️ Last seconds' },
+      mute: { es: '🔇 Silencio', ca: '🔇 Silenci', en: '🔇 Mute' },
+      stepAria: { es: 'Escalón', ca: 'Esglaó', en: 'Step' },
+      lPad: { es: 'Acordes que nunca resuelven (re menor → la mayor)', ca: 'Acords que mai no resolen (re menor → la major)', en: 'Chords that never resolve (D minor → A major)' },
+      lBass: { es: 'Bajo con medio tono inquieto', ca: 'Baix amb un mig to inquiet', en: 'Bass with a restless half-step' },
+      lTick: { es: 'Reloj que acelera', ca: 'Rellotge que accelera', en: 'A clock that speeds up' },
+      lHeart: { es: 'Latido (desde el escalón 4)', ca: 'Batec (des de l\'esglaó 4)', en: 'Heartbeat (from step 4)' },
+      lArp: { es: 'Arpegio que sube (desde el escalón 7)', ca: 'Arpegi que puja (des de l\'esglaó 7)', en: 'Climbing arpeggio (from step 7)' },
+      lDrone: { es: 'Zumbido agudo (últimos segundos)', ca: 'Brunzit agut (últims segons)', en: 'High drone (last seconds)' },
+    });
+    E.langSwitch(document.getElementById('lang'));
+
+    const duro = document.getElementById('duro');
+    duro.innerHTML = E.mascotSVG();
+    E.initHosts();
+
+    const playBtn = document.getElementById('play');
+    const stepEl = document.getElementById('step');
+    const dangerBtn = document.getElementById('danger');
+    const muteBtn = document.getElementById('mute');
+    const fmt = (n) => (100 * 2 ** (n - 1)).toLocaleString(E.lang) + ' €';
+
+    function intensity() { return (stepEl.value - 1) / 14; }
+    function render() {
+      playBtn.textContent = E.t(A.music.playing ? 'stop' : 'play');
+      document.getElementById('step-n').textContent = stepEl.value;
+      document.getElementById('prize').textContent = fmt(+stepEl.value);
+      muteBtn.setAttribute('aria-pressed', A.muted);
+      dangerBtn.setAttribute('aria-pressed', A.music.danger);
+      const x = intensity(), d = A.music.danger;
+      const layers = [['lPad', true], ['lBass', true], ['lTick', true], ['lHeart', x > 0.2 || d], ['lArp', x > 0.4], ['lDrone', d]];
+      document.getElementById('layers').innerHTML = layers.map(([k, on]) => `<li class="${on && A.music.playing ? 'on' : ''}">${E.t(k)}</li>`).join('');
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (A.music.playing) A.music.stop(); else { A.music.setIntensity(intensity()); A.music.start(); E.react(duro, 'hop'); }
+      render();
+    });
+    stepEl.addEventListener('input', () => { A.music.setIntensity(intensity()); render(); });
+    dangerBtn.addEventListener('click', () => {
+      A.music.setDanger(!A.music.danger);
+      if (A.music.danger) E.react(duro, 'wobble');
+      render();
+    });
+    muteBtn.addEventListener('click', () => { A.setMuted(!A.muted); render(); });
+    E.onLang(render);
+    render();
+  </script>
+</body>
+</html>

@@ -3,6 +3,14 @@
 // The technical list is CHANGELOG.md.
 window.ECO_NEWS = [
   {
+    id: 2, version: '0.2.0', date: '2026-11-14', emoji: '🎵',
+    text: {
+      es: 'Escucha la música de «¿Te lo llevas?» en la Sala de música (abajo del todo): cuanto más alto subes, más aprieta.',
+      ca: 'Escolta la música de «T\'ho emportes?» a la Sala de música (a baix de tot): com més amunt puges, més estreny.',
+      en: 'Hear the music of “Cash Out?” in the Music room (at the bottom): the higher you climb, the tighter it gets.',
+    },
+  },
+  {
     id: 1, version: '0.1.0', date: '2026-11-14', emoji: '🪙',
     text: {
       es: 'Abrimos la puerta: conoce a Duro, nuestra moneda. Se puede instalar como app y avisa sola de las novedades.',
