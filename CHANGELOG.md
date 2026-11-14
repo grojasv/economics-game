@@ -4,6 +4,18 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
+## [0.2.1] — 2026-11-14
+### Fixed
+Found by a review pass that measured the music on the final mix (an analyser tap, `EcoAudio._tap()`):
+- **The tension barely grew:** step 1 → 15 was only +2 dB, and step 7 was quieter than step 4. Bass, pad and arpeggio now get louder with the stakes; on a phone-speaker estimate (energy above 200 Hz) the level now rises steadily, about 8 dB from step 1 to the last seconds (−31 → −28 → −27 → −25 → −25 → −23 dB at steps 1, 4, 7, 11, 15 and the last seconds). Peaks stay below 0.65, so there is no clipping.
+- **The heartbeat would vanish on phones:** it lived below 110 Hz. It now has a short knock around 110–240 Hz that small speakers can play. The sub-octave of the bass is a sine instead of a square.
+- **The clock tick was almost inaudible** (a very narrow filter). It is wider, louder and lower (4.2 / 6.2 kHz), and it grows with the stakes.
+- **Leaving the app** now pauses all sound, and coming back resumes it. After a stalled timer the music skips the missed steps instead of firing them all at once.
+- Music room: the ▶ button no longer wraps onto two lines at 320 px.
+- Hub footer: the "·" separators are gone (one was left hanging when the row wrapped at 320 px).
+- Page titles follow the language (`docTitle` key in `Eco.dict()`).
+- Music bus level 0.55 → 0.7. Service worker cache `eco-v3`.
+
 ## [0.2.0] — 2026-11-14
 ### Added
 - **Tension music** for *¿Te lo llevas?* (`shared/audio.js`, `window.EcoAudio`), generated with Web Audio, no audio files:

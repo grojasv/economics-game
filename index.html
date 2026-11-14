@@ -70,7 +70,7 @@
     .install p { margin: 0; flex: 1; font-size: .9rem; line-height: 1.35; }
 
     footer { margin-top: 40px; padding: 16px 0 calc(22px + env(safe-area-inset-bottom)); border-top: 1.5px solid var(--ink); font-size: .82rem; color: var(--ink-soft); }
-    footer .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; }
+    footer .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 20px; }
     footer button { background: none; border: 0; padding: 4px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; color: inherit; }
     footer .version { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
 
@@ -123,11 +123,8 @@
     <footer>
       <div class="row">
         <span class="version" id="version"></span>
-        <span aria-hidden="true">·</span>
         <button type="button" id="news-link" data-i18n="whatsNew"></button>
-        <span aria-hidden="true">·</span>
         <a id="changelog-link" target="_blank" rel="noopener" data-i18n="changelog"></a>
-        <span aria-hidden="true">·</span>
         <a href="music/" data-i18n="music"></a>
       </div>
     </footer>
@@ -151,6 +148,7 @@
     const E = window.Eco;
     E.dict({
       title: { es: 'Juego de Economía', ca: "Joc d'Economia", en: 'Economics Game' },
+      docTitle: { es: 'Juego de Economía', ca: "Joc d'Economia", en: 'Economics Game' },
       kicker: { es: 'beta', ca: 'beta', en: 'beta' },
       hello: { es: 'Hola, soy Duro.', ca: 'Hola, sóc en Duro.', en: "Hi, I'm Duro." },
       intro: {

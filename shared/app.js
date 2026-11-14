@@ -1,7 +1,7 @@
 // Shared runtime for every page: language, mascot, animations, PWA install,
 // update check. Exposed as window.Eco.
 (() => {
-  const VERSION = '0.2.0'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
+  const VERSION = '0.2.1'; // bump on every release, with CACHE in sw.js and a CHANGELOG.md section
   const REPO = 'https://github.com/grojasv/economics-game';
   const LANGS = ['es', 'ca', 'en'];
   const LANG_LABEL = { es: 'ES', ca: 'CA', en: 'EN' };
@@ -33,6 +33,7 @@
   }
   function applyI18n(root = document) {
     root.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+    if (dictionary.docTitle) document.title = t('docTitle');
     root.querySelectorAll('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
     document.documentElement.lang = lang;
   }

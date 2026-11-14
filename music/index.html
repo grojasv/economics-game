@@ -20,7 +20,7 @@
     .panel { background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--radius); box-shadow: 4px 4px 0 var(--ink); padding: 18px; display: grid; gap: 18px; }
     .stage { display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; }
     .stage [data-host] { width: 96px; }
-    .play { font-size: 1.05rem; padding: 12px 22px; }
+    .play { font-size: 1.05rem; padding: 12px 22px; white-space: nowrap; }
     label.row { display: grid; gap: 8px; font-weight: 600; }
     .step-out { font-family: var(--serif); font-size: 1.6rem; font-weight: 800; }
     .step-out small { font-family: var(--sans); font-size: .85rem; font-weight: 600; color: var(--ink-soft); margin-left: 8px; }
@@ -74,6 +74,7 @@
     E.dict({
       back: { es: '← Inicio', ca: '← Inici', en: '← Home' },
       title: { es: 'Sala de música', ca: 'Sala de música', en: 'Music room' },
+      docTitle: { es: 'Sala de música · Juego de Economía', ca: "Sala de música · Joc d'Economia", en: 'Music room · Economics Game' },
       lead: {
         es: 'La música de «¿Te lo llevas?». Sube el escalón para oír cómo crece la tensión, y activa «Últimos segundos» para el final del reloj.',
         ca: 'La música de «T\'ho emportes?». Puja l\'esglaó per sentir com creix la tensió, i activa «Últims segons» per al final del rellotge.',

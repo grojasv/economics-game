@@ -11,6 +11,7 @@
 //   EcoAudio.setMuted(bool) / EcoAudio.muted
 (() => {
   let ctx = null, master = null, musicBus = null, sfxBus = null, reverb = null, delay = null;
+  const MUSIC_LEVEL = 0.7;
   let muted = false;
   try { muted = JSON.parse(localStorage.getItem('eco.muted') || 'false'); } catch { /* private mode */ }
 
@@ -21,7 +22,7 @@
     comp.threshold.value = -18; comp.ratio.value = 4;
     master = ctx.createGain(); master.gain.value = muted ? 0 : 0.9;
     master.connect(comp).connect(ctx.destination);
-    musicBus = ctx.createGain(); musicBus.gain.value = 0.55; musicBus.connect(master);
+    musicBus = ctx.createGain(); musicBus.gain.value = MUSIC_LEVEL; musicBus.connect(master);
     sfxBus = ctx.createGain(); sfxBus.gain.value = 0.8; sfxBus.connect(master);
 
     // Reverb: a generated decaying-noise impulse response
@@ -53,29 +54,29 @@
   }
 
   // ---------- instruments ----------
-  function bass(t, midi, dur, cutoff) {
+  function bass(t, midi, dur, cutoff, vel = 0.22) {
     const o = ctx.createOscillator(), o2 = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-    o.type = 'sawtooth'; o2.type = 'square';
+    o.type = 'sawtooth'; o2.type = 'sine';
     o.frequency.value = hz(midi); o2.frequency.value = hz(midi - 12);
     f.type = 'lowpass'; f.Q.value = 7;
     f.frequency.setValueAtTime(cutoff * 2.2, t);
     f.frequency.exponentialRampToValueAtTime(cutoff * 0.6, t + dur);
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.22, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(vel, t + 0.01);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.95);
     o.connect(f); o2.connect(f); f.connect(g);
     send(g, 1, 0.05);
     o.start(t); o2.start(t); o.stop(t + dur); o2.stop(t + dur);
   }
 
-  function pad(t, notes, dur, bright) {
+  function pad(t, notes, dur, bright, vel = 0.07) {
     const f = ctx.createBiquadFilter(), g = ctx.createGain();
     f.type = 'lowpass'; f.Q.value = 2;
     f.frequency.setValueAtTime(300 + bright * 300, t);
     f.frequency.linearRampToValueAtTime(700 + bright * 1900, t + dur * 0.7); // swell
     f.frequency.linearRampToValueAtTime(400 + bright * 400, t + dur);
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(0.07, t + dur * 0.35);
+    g.gain.linearRampToValueAtTime(vel, t + dur * 0.35);
     g.gain.linearRampToValueAtTime(0.0001, t + dur + 0.4);
     f.connect(g); send(g, 0.8, 0.7);
     notes.forEach((n) => [-7, 0, 7].forEach((cents) => {
@@ -102,10 +103,20 @@
     o.frequency.setValueAtTime(110, t);
     o.frequency.exponentialRampToValueAtTime(38, t + 0.18);
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.75 * vel, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.6 * vel, t + 0.008);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
     o.connect(g); send(g, 1, 0.08);
     o.start(t); o.stop(t + 0.32);
+    // the knock: a short triangle thump around 200 Hz, audible on small speakers
+    const k = ctx.createOscillator(), kg = ctx.createGain();
+    k.type = 'triangle';
+    k.frequency.setValueAtTime(240, t);
+    k.frequency.exponentialRampToValueAtTime(110, t + 0.09);
+    kg.gain.setValueAtTime(0.0001, t);
+    kg.gain.exponentialRampToValueAtTime(0.32 * vel, t + 0.004);
+    kg.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    k.connect(kg); send(kg, 1, 0.1);
+    k.start(t); k.stop(t + 0.14);
   }
 
   let noiseBuf = null;
@@ -119,7 +130,7 @@
   function tick(t, vel = 0.05, tone = 7000) {
     const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
     s.buffer = noise();
-    f.type = 'bandpass'; f.frequency.value = tone; f.Q.value = 6;
+    f.type = 'bandpass'; f.frequency.value = tone; f.Q.value = 1.8;
     g.gain.setValueAtTime(vel, t);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
     s.connect(f).connect(g); send(g, 1, 0.1);
@@ -169,15 +180,15 @@
     const cutoff = 220 + intensity * 500 + (danger ? 300 : 0);
 
     // Pad: one long swell per chord (every 2 bars)
-    if (pos === 0 && bar % 2 === 0) pad(t, chord.pad, sixteenth * 32, intensity);
+    if (pos === 0 && bar % 2 === 0) pad(t, chord.pad, sixteenth * 32, intensity, 0.05 + intensity * 0.05);
 
     // Bass ostinato (always)
     const b = BASS[pos];
-    if (b !== null) bass(t, chord.root + 12 + b, sixteenth * 1.8, cutoff);
+    if (b !== null) bass(t, chord.root + 12 + b, sixteenth * 1.8, cutoff, 0.16 + intensity * 0.12);
 
     // Clock tick: quarters at rest, eighths from mid stakes, sixteenths in danger
     const tickEvery = danger ? 1 : intensity > 0.45 ? 2 : 4;
-    if (pos % tickEvery === 0) tick(t, pos % 4 === 0 ? 0.06 : 0.03, pos % 4 === 0 ? 6500 : 8500);
+    if (pos % tickEvery === 0) tick(t, (pos % 4 === 0 ? 0.16 : 0.09) * (1 + intensity * 0.6), pos % 4 === 0 ? 4200 : 6200);
 
     // Heartbeat (lub-dub) from low-mid stakes; twice a bar in danger
     if (intensity > 0.2 || danger) {
@@ -190,7 +201,7 @@
       const every = intensity > 0.75 || danger ? 1 : 2;
       if (pos % every === 0) {
         const n = chord.arp[(pos / every) % chord.arp.length];
-        pluck(t, n + (intensity > 0.85 ? 12 : 0), 0.05 + intensity * 0.05);
+        pluck(t, n + (intensity > 0.85 ? 12 : 0), 0.06 + intensity * 0.09);
       }
     }
 
@@ -199,6 +210,9 @@
   }
 
   function scheduler() {
+    // If the timer was throttled (busy phone, background tab), skip the missed steps
+    // instead of firing them all at once.
+    if (nextTime < ctx.currentTime - 0.05) nextTime = ctx.currentTime + 0.05;
     while (nextTime < ctx.currentTime + 0.12) {
       scheduleStep(step, nextTime);
       nextTime += 60 / bpm() / 4;
@@ -214,7 +228,7 @@
       playing = true; step = 0; nextTime = ctx.currentTime + 0.08;
       musicBus.gain.cancelScheduledValues(ctx.currentTime);
       musicBus.gain.setValueAtTime(0.0001, ctx.currentTime);
-      musicBus.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 1.5);
+      musicBus.gain.linearRampToValueAtTime(MUSIC_LEVEL, ctx.currentTime + 1.5);
       timer = setInterval(scheduler, 25);
       if (danger) setDrone(true);
     },
@@ -234,6 +248,13 @@
     get danger() { return danger; },
   };
 
+  // Leaving the app pauses all sound; coming back resumes the music where it was.
+  document.addEventListener('visibilitychange', () => {
+    if (!ctx) return;
+    if (document.hidden) ctx.suspend().catch(() => {});
+    else if (playing) ctx.resume().catch(() => {});
+  });
+
   window.EcoAudio = {
     music,
     get muted() { return muted; },
@@ -244,5 +265,7 @@
     },
     // Sound effects share the context; added with the quiz.
     _ctx: () => init(), _sfxBus: () => (init(), sfxBus),
+    // Debug: an analyser on the final mix, to measure levels from the console.
+    _tap() { init(); const a = ctx.createAnalyser(); a.fftSize = 2048; master.connect(a); return a; },
   };
 })();
