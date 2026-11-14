@@ -9,10 +9,14 @@ Economics games for an adult audience (working title). Plain HTML/CSS/JS, no bui
 - Works at 320 px wide with no horizontal scroll; main action always on screen.
 - New game: folder `games/<id>/`, entry in `games.js` (`status: 'live'`, `path`), files in `PRECACHE`.
 
+## Content sources
+- Game content (questions, scenarios) comes only from the official syllabus in `docs/curriculum.md` (3 Bachillerato economics subjects, RD 243/2022). Tag each item with its subject code and block (e.g. `ECO-A`).
+
 ## Changelogs (update on every change, in the same commit)
 - `CHANGELOG.md` — technical, Keep a Changelog + SemVer.
 - `news.js` — player-facing, short, ES/CA/EN, `id` always increasing. Pure technical changes don't go here.
 - Every release: bump `VERSION` in `shared/app.js` and `CACHE` in `sw.js`.
 
 ## Git
+- Commit and push directly to `main` (deploys to Pages); no approval needed for this project.
 - Commits use the GitHub noreply email (repo-local git config), never a work address.

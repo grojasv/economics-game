@@ -19,6 +19,7 @@ sw.js                service worker (offline cache)
 manifest.webmanifest PWA manifest
 icons/               app icons (rendered from the mascot SVG)
 games/<id>/          one folder per game (none yet)
+docs/curriculum.md   official sources for game content (3 Bachillerato economics subjects)
 ```
 
 ## Installable app

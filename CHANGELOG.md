@@ -4,6 +4,10 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/), ve
 
 The player-facing version of this list lives in `news.js` (hub → 🗞️ *What's new*).
 
+## [Unreleased]
+### Added
+- `docs/curriculum.md`: the official sources for game content — the three economics subjects of Bachillerato (Real Decreto 243/2022, Annex II): Economía (1º), Economía, Emprendimiento y Actividad Empresarial (1º) and Empresa y Diseño de Modelos de Negocio (2º), with subject codes for tagging and a draft map to game ideas.
+
 ## [0.1.0] — 2026-11-14
 ### Added
 - Foundation, modelled on Laboratorio Mellis: plain HTML/CSS/JS, no build step, GitHub Pages, relative paths only.
