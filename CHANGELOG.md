@@ -6,6 +6,7 @@ The player-facing version of this list lives in `news.js` (hub → 🗞️ *What
 
 ## [Unreleased]
 ### Added
+- `docs/quiz-spec.md`: draft spec of the first game, *¿Te lo llevas?* (a 15-step quiz ladder with cash-out, lifelines, timer, a ranking on the device and a share card).
 - `docs/curriculum.md`: the official sources for game content — the three economics subjects of Bachillerato (Real Decreto 243/2022, Annex II): Economía (1º), Economía, Emprendimiento y Actividad Empresarial (1º) and Empresa y Diseño de Modelos de Negocio (2º), with subject codes for tagging and a draft map to game ideas.
 
 ## [0.1.0] — 2026-11-14
